@@ -1,0 +1,64 @@
+Metadata-Version: 2.1
+Name: testcase
+Version: 0.1.0
+Summary: Run tabular unit tests
+Home-page: https://github.com/ajzaff/testcase
+Author: Alan Zaffetti
+Author-email: ajzaff@gmail.com
+License: UNKNOWN
+Project-URL: Bug Reports, https://github.com/ajzaff/testcase/issues
+Project-URL: Source, https://github.com/ajzaff/testcase/
+Keywords: tabular test development utility
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Testing :: Unit
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Description-Content-Type: text/markdown
+
+# testcase
+Run tabular unit tests.
+
+## Support
+
+It has been tested with `unittest.TestCase`.
+Basically it will work with any class that implements:
+- `assertEqual(x, y)`
+- `assertRaises(t)` with `__enter__` and `__exit__` handlers for `with`.
+
+## Example
+
+```python
+import unittest
+import testcase
+
+
+def foo(x, y):
+    return x / y
+
+
+class FooTest(unittest.TestCase):
+    def test_foo(self):
+        testcase.runall(self, foo, [
+            testcase.new(
+                name='1 / 1 = 1',
+                args=(1, 1),
+                expect=1),
+            testcase.new(
+                name='raises ZeroDivisionError',
+                args=(1, 0),
+                raises=ZeroDivisionError),
+        ])
+
+
+if __name__ == '__main__':
+    unittest.main()
+
+```
+
