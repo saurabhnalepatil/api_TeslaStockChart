@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-connection_string = "my_connection-string"
+connection_string = "DefaultEndpointsProtocol=https;AccountName=huntscaler;AccountKey=lTQDEP116R7sJ/A81f6Y2Q3Ep5MP01g0bFybjfQWFUhch9HcxxYCtpHbgRAqlkgH03A7EXB57/QZ+AStJ6LtAQ==;EndpointSuffix=core.windows.net"
 table_name = "Tesla"
 
 
@@ -142,20 +142,23 @@ def update_data():
 @app.route("/api/insert-message", methods=["POST"])
 def insert_message():
     try:
-        message = request.json
-
-        if not message:
+        message = request.get_json()
+        msg = message.get("message")
+        if not msg:
             return "Invalid request. Message is missing.", 400
     except Exception as e:
         return "Invalid request. Could not parse JSON data.", 400
 
-    queue_client = QueueClient.from_connection_string(connection_string, "tesla-queue")
-    queue_client.send_message(message)
+    queue_client = QueueClient.from_connection_string(
+        connection_string, "trigger-function"
+    )
+    queue_client.send_message(msg)
 
-    return "Message inserted into the queue successfully"
+    return (jsonify("Message inserted into the queue successfully"), 200)
 
 
-@app.route("/api/reseed-data", methods=["PATCH"])
+# //////////////////////////Practice Azure Function///////////////////////////////////////////////////
+@app.route("/api/reseed_data", methods=["POST"])
 def reseed_data():
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
     blob_client = blob_service_client.get_blob_client("tesladata", "TSLA.csv")
@@ -178,13 +181,13 @@ def reseed_data():
             data = row.split(",")
             my_entity = {
                 "PartitionKey": "TSLA",
-                "RowKey": data[0],
-                "Open": data[1],
-                "High": data[2],
-                "Low": data[3],
-                "Close": data[4],
-                "Adj_Close": data[5],
-                "Volume": data[6],
+                "RowKey": data[0].strip().replace("\r", ""),
+                "Open": data[1].strip().replace("\r", ""),
+                "High": data[2].strip().replace("\r", ""),
+                "Low": data[3].strip().replace("\r", ""),
+                "Close": data[4].strip().replace("\r", ""),
+                "Adj_Close": data[5].strip().replace("\r", ""),
+                "Volume": data[6].strip().replace("\r", ""),
             }
             table_client.create_entity(entity=my_entity)
 
