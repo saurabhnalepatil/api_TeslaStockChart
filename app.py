@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-connection_string = "DefaultEndpointsProtocol=https;AccountName=huntscaler;AccountKey=lTQDEP116R7sJ/A81f6Y2Q3Ep5MP01g0bFybjfQWFUhch9HcxxYCtpHbgRAqlkgH03A7EXB57/QZ+AStJ6LtAQ==;EndpointSuffix=core.windows.net"
+connection_string = "Connection String"
 table_name = "Tesla"
 
 
